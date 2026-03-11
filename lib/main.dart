@@ -7,7 +7,6 @@ import 'package:rhythmax/core/player/player_provider.dart';
 import 'package:rhythmax/core/source/source_manager.dart';
 import 'package:rhythmax/core/theme/dynamic_color_helper.dart';
 import 'package:rhythmax/core/source/jiosaavn/jiosaavn_source.dart';
-
 import 'package:rhythmax/core/theme/theme_controller.dart';
 import 'package:rhythmax/core/theme/theme_scope.dart';
 import 'package:rhythmax/ui/app_shell_page.dart';
@@ -20,7 +19,7 @@ void main() async {
   DeviceOrientation.portraitUp,
 ]);
 
-await _registerSources();
+  await _registerSources();
 
   await AudioService.init(
     builder: () => RhythmaxAudioHandler(),

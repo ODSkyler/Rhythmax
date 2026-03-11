@@ -9,24 +9,16 @@ enum AudioQuality {
 class Track {
   final String id;
   final String source;
-
   final String title;
-
   final List<String> artists;
   final List<String> artistIds;
-
   final String? album;
   final String? albumId;
-
   final Duration duration;
-
   final String? artworkUrl;
-
   final bool isExplicit;
-
   /// Optional source-specific URL (not required for all sources)
   final String? sourceUrl;
-
   /// ⭐ Source-specific playback metadata
   /// Example (JioSaavn):
   /// { "encrypted_media_url": "..." }

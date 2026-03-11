@@ -578,9 +578,9 @@ class _SearchPageState extends State<SearchPage>
     switch (sourceId) {
       case 'jiosaavn':
         return 'assets/images/jiosaavn.png';
-      case 'youtube_music':
+      case 'youtube':
         return 'assets/images/youtube_music.png';
-      case 'tidal_binilossless':
+      case 'tidal':
         return 'assets/images/tidal.png';
       default:
         return 'assets/images/music_placeholder.jpg';

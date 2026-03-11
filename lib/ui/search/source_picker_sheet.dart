@@ -74,9 +74,9 @@ class SourcePickerSheet extends StatelessWidget {
     switch (sourceId) {
       case 'jiosaavn':
         return 'assets/images/jiosaavn.png';
-      case 'tidal_binilossless':
+      case 'tidal':
         return 'assets/images/tidal.png';
-      case 'youtube_music':
+      case 'youtube':
         return 'assets/images/youtube_music.png';
       default:
         return 'assets/images/album_placeholder.jpg';
