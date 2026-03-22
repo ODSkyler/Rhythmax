@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:rhythmax/core/audio/rhythmax_audio_handler.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
@@ -20,6 +21,8 @@ void main() async {
 ]);
 
   await _registerSources();
+  await Hive.initFlutter();
+  await Hive.openBox('library');
 
   await AudioService.init(
     builder: () => RhythmaxAudioHandler(),

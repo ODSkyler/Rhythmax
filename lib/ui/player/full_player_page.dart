@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rhythmax/core/models/track.dart';
+import 'package:rhythmax/core/library/library_manager.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
 import 'package:rhythmax/ui/player/queue_bottom_sheet.dart';
 import 'package:rhythmax/core/player/player_controller.dart';
@@ -434,26 +435,35 @@ class _FullPlayerPageState extends State<FullPlayerPage> {
                         MainAxisAlignment.spaceAround,
                         children: [
                           IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints:
-                            const BoxConstraints(),
-                            icon: const Icon(
-                                Icons.favorite_border),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                                  content: Align(
-                                    alignment: Alignment.center,
-                                    child: Text('This feature is coming soon!',
-                                      style: TextStyle(
-                                          color: Colors.black
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                            icon: Icon(
+                              LibraryManager.isLiked(track)
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: LibraryManager.isLiked(track)
+                                  ? Colors.red
+                                  : null,
+                            ),
+                            onPressed: () async {
+
+                              if (LibraryManager.isLiked(track)) {
+
+                                await LibraryManager.unlikeTrack(track);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Removed from Library")),
+                                );
+
+                              } else {
+
+                                await LibraryManager.likeTrack(track);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Added to Library")),
+                                );
+
+                              }
+
+                              setState(() {});
                             },
                           ),
                           IconButton(

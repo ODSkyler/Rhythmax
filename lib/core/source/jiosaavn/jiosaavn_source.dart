@@ -228,38 +228,49 @@ class JioSaavnSource extends MusicSource {
         dynamic quality,
       }) async {
 
-    /* ---------------- 1️⃣ LIBRARY (INSTANT PLAY) ---------------- */
+    /* 1️⃣ PLAY DIRECTLY IF AUDIO URL IS SAVED */
 
-    final fromLibrary = track.sourceExtras?['encrypted_media_url'];
+    final savedAudio = track.sourceExtras?['audioUrl'];
 
-    if (fromLibrary is String && fromLibrary.isNotEmpty) {
-      final suffix = _qualitySuffix[_quality]!;
-      final url = JioSaavnDecrypt.decrypt(fromLibrary, suffix);
-
+    if (savedAudio is String && savedAudio.isNotEmpty) {
       globalPlayer.setQualityLabel(_qualityLabel[_quality]!);
-      return Uri.parse(url);
+      return Uri.parse(savedAudio);
     }
 
-    /* ---------------- 2️⃣ RUNTIME CACHE ---------------- */
+    /* 2️⃣ USE STORED ENCRYPTED URL FIRST */
 
-    String? encrypted = _encryptedCache[track.id];
+    String? encrypted = track.sourceExtras?['encrypted_media_url'];
 
-    /* ---------------- 3️⃣ FETCH IF NEEDED ---------------- */
+    /* 3️⃣ FALLBACK (ONLY IF REALLY NEEDED) */
 
     if (encrypted == null) {
-      encrypted = await _fetchEncryptedUrl(track.id);
+      encrypted = _encryptedCache[track.id];
 
       if (encrypted == null) {
-        throw Exception('Unable to fetch stream data for ${track.id}');
-      }
+        encrypted = await _fetchEncryptedUrl(track.id);
 
-      _encryptedCache[track.id] = encrypted;
+        if (encrypted == null) {
+          throw Exception('Unable to fetch stream data for ${track.id}');
+        }
+
+        _encryptedCache[track.id] = encrypted;
+      }
     }
 
     /* ---------------- 4️⃣ DECRYPT ---------------- */
 
     final suffix = _qualitySuffix[_quality]!;
     final url = JioSaavnDecrypt.decrypt(encrypted, suffix);
+
+    /* STORE DECRYPTED URL IN TRACK */
+
+    track = track.copyWith(
+      sourceExtras: {
+        ...?track.sourceExtras,
+        "encrypted_media_url": encrypted,
+        "audioUrl": url,
+      },
+    );
 
     globalPlayer.setQualityLabel(_qualityLabel[_quality]!);
 

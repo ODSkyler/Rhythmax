@@ -39,6 +39,58 @@ class Track {
     this.sourceExtras, // ⭐ NEW
   });
 
+  String get libraryKey => "${source}_$id";
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "source": source,
+      "title": title,
+      "artists": artists,
+      "artistIds": artistIds,
+      "album": album,
+      "albumId": albumId,
+      "duration": duration.inMilliseconds,
+      "artworkUrl": artworkUrl,
+      "isExplicit": isExplicit,
+      "sourceUrl": sourceUrl,
+      "sourceExtras": sourceExtras,
+    };
+  }
+
+  factory Track.fromMap(Map map) {
+    return Track(
+      id: map["id"]?.toString() ?? "",
+      source: map["source"]?.toString() ?? "",
+      title: map["title"]?.toString() ?? "",
+
+      artists: List<String>.from(
+        (map["artists"] ?? []).map((e) => e.toString()),
+      ),
+
+      artistIds: List<String>.from(
+        (map["artistIds"] ?? []).map((e) => e.toString()),
+      ),
+
+      album: map["album"]?.toString(),
+      albumId: map["albumId"]?.toString(),
+
+      duration: Duration(
+        milliseconds: map["duration"] ?? 0,
+      ),
+
+      artworkUrl: map["artworkUrl"]?.toString(),
+
+      isExplicit: map["isExplicit"] ?? false,
+
+      sourceUrl: map["sourceUrl"]?.toString(),
+
+      sourceExtras: map["sourceExtras"] != null
+          ? Map<String, dynamic>.from(map["sourceExtras"])
+          : null,
+    );
+  }
+
   // ✅ COPY WITH (VERY IMPORTANT FOR LIKE SYSTEM)
   Track copyWith({
     String? id,
