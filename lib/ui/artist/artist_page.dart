@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rhythmax/core/models/artist.dart';
 import 'package:rhythmax/core/models/artist_details.dart';
+import 'package:rhythmax/core/library/artist_library_manager.dart';
 import 'package:rhythmax/core/models/track.dart';
 import 'package:rhythmax/core/models/album.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
@@ -146,21 +147,32 @@ class _ArtistDetailsPageState extends State<ArtistDetailsPage> {
                         radius: 24,
                         backgroundColor: Colors.white24,
                         child: IconButton(
-                          icon: const Icon(Icons.favorite_border),
-                          color: Colors.white,
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                                content: const Center(
-                                  child: Text(
-                                    'This feature is coming soon!',
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                            );
+                          icon: Icon(
+                            ArtistLibraryManager.isLiked(widget.artist)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: ArtistLibraryManager.isLiked(widget.artist)
+                                ? Colors.cyanAccent
+                                : Colors.white,
+                          ),
+                          onPressed: () async {
+
+                            if (ArtistLibraryManager.isLiked(widget.artist)) {
+                              await ArtistLibraryManager.unlikeArtist(widget.artist);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Removed from Library")),
+                              );
+
+                            } else {
+                              await ArtistLibraryManager.likeArtist(widget.artist);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Added to Library")),
+                              );
+                            }
+
+                            setState(() {});
                           },
                         ),
                       ),

@@ -148,7 +148,7 @@ class _LikedTracksPageState extends State<LikedTracksPage> {
               queue: tracks,
               sourceId: 'liked_tracks',
               sourceType: 'library',
-              playType: 'LIKED TRACKS',
+              playType: 'THE PLAYLIST',
               sourceTitle: 'Liked Tracks',
             );
           },

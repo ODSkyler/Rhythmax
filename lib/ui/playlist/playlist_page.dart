@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rhythmax/core/models/playlist.dart';
 import 'package:rhythmax/core/models/track.dart';
+import 'package:rhythmax/core/library/playlist_library_manager.dart';
 import 'package:rhythmax/core/source/source_manager.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
 import 'package:rhythmax/ui/widget/track_options_sheet.dart';
@@ -272,21 +273,32 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   radius: 24,
                   backgroundColor: Colors.white24,
                   child: IconButton(
-                    icon: const Icon(Icons.favorite_border, size: 24),
-                    color: Colors.white,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor:
-                          Theme.of(context).colorScheme.primary,
-                          content: const Center(
-                            child: Text(
-                              'This feature is coming soon!',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      );
+                    icon: Icon(
+                      PlaylistLibraryManager.isLiked(playlist)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: PlaylistLibraryManager.isLiked(playlist)
+                          ? Colors.cyanAccent
+                          : Colors.white,
+                    ),
+                    onPressed: () async {
+
+                      if (PlaylistLibraryManager.isLiked(playlist)) {
+                        await PlaylistLibraryManager.unlikePlaylist(playlist);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Removed from Library")),
+                        );
+
+                      } else {
+                        await PlaylistLibraryManager.likePlaylist(playlist);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Added to Library")),
+                        );
+                      }
+
+                      setState(() {});
                     },
                   ),
                 ),

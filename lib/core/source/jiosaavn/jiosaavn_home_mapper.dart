@@ -37,38 +37,54 @@ class JioSaavnHomeMapper {
     for (final raw in rawList) {
       if (raw is! Map) continue;
 
-      final type = raw['type'];
+      final type = raw['type']?.toString();
 
-      if (type == 'album') {
-        items.add(
-          HomeItem.album(
-            Album(
-              id: _token(raw['perma_url']),
-              source: 'jiosaavn',
-              title: cleanText(raw['title'] ?? ''),
-              artists: [cleanText(raw['subtitle'] ?? '')],
-              artworkUrl: _img(raw['image']),
-              releaseDate: _year(raw['year']),
-              tracks: const [],
-            ),
-          ),
-        );
-      }
+      switch (type) {
 
-      if (type == 'playlist') {
-        items.add(
-          HomeItem.playlist(
-            Playlist(
-              id: _token(raw['perma_url']),
-              source: 'jiosaavn',
-              type: PlaylistType.source,
-              title: cleanText(raw['title'] ?? ''),
-              description: cleanText(raw['subtitle'] ?? ''),
-              artworkUrl: _img(raw['image']),
-              tracks: const [],
+      /* -------------------------- ALBUM -------------------------- */
+
+        case 'album':
+          final artists = _extractArtists(raw);
+
+          items.add(
+            HomeItem.album(
+              Album(
+                id: _token(raw['perma_url']),
+                source: 'jiosaavn',
+                title: cleanText(raw['title'] ?? ''),
+                artists: artists.isNotEmpty
+                    ? artists
+                    : ['Unknown Artist'],
+                artworkUrl: _img(raw['image']),
+                releaseDate: _year(raw['year']),
+                tracks: const [],
+              ),
             ),
-          ),
-        );
+          );
+          break;
+
+      /* ------------------------- PLAYLIST ------------------------- */
+
+        case 'playlist':
+          items.add(
+            HomeItem.playlist(
+              Playlist(
+                id: _token(raw['perma_url']),
+                source: 'jiosaavn',
+                type: PlaylistType.source,
+                title: cleanText(raw['title'] ?? ''),
+                description: cleanText(raw['subtitle'] ?? ''),
+                artworkUrl: _img(raw['image']),
+                tracks: const [],
+              ),
+            ),
+          );
+          break;
+
+      /* ------------------------- UNKNOWN -------------------------- */
+
+        default:
+          continue;
       }
     }
 
@@ -88,5 +104,24 @@ class JioSaavnHomeMapper {
   static DateTime? _year(dynamic y) {
     final v = int.tryParse(y?.toString() ?? '');
     return v != null ? DateTime(v) : null;
+  }
+
+  static List<String> _extractArtists(Map raw) {
+
+    final moreInfo = raw['more_info'];
+    if (moreInfo is! Map) return [];
+
+    final artistMap = moreInfo['artistMap'];
+    if (artistMap is! Map) return [];
+
+    final primary = artistMap['primary_artists'] as List? ?? [];
+    final fallback = artistMap['artists'] as List? ?? [];
+
+    final list = primary.isNotEmpty ? primary : fallback;
+
+    return list
+        .map((a) => cleanText(a['name'] ?? ''))
+        .where((name) => name.isNotEmpty)
+        .toList();
   }
 }

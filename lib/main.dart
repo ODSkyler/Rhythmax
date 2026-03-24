@@ -21,8 +21,12 @@ void main() async {
 ]);
 
   await _registerSources();
+
   await Hive.initFlutter();
   await Hive.openBox('library');
+  await Hive.openBox('library_albums');
+  await Hive.openBox('library_artists');
+  await Hive.openBox('library_playlists');
 
   await AudioService.init(
     builder: () => RhythmaxAudioHandler(),

@@ -440,7 +440,7 @@ class _FullPlayerPageState extends State<FullPlayerPage> {
                                   ? Icons.favorite
                                   : Icons.favorite_border,
                               color: LibraryManager.isLiked(track)
-                                  ? Colors.red
+                                  ? Colors.cyanAccent
                                   : null,
                             ),
                             onPressed: () async {

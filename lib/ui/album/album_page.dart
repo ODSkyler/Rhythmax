@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rhythmax/core/models/album.dart';
+import 'package:rhythmax/core/library/album_library_manager.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
 import 'package:rhythmax/core/source/source_manager.dart';
 import 'package:rhythmax/ui/widget/track_options_sheet.dart';
@@ -252,24 +253,34 @@ class _AlbumPageState extends State<AlbumPage> {
                   backgroundColor:
                   Colors.white24,
                   child: IconButton(
-                    icon: const Icon(Icons.favorite_border, size: 24,),
-                    color: Colors.white,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor:
-                          Theme.of(context).colorScheme.primary,
-                          content: Align(
-                            alignment: Alignment.center,
-                            child: Text('This feature is coming soon!',
-                              style: TextStyle(
-                                  color: Colors.black
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                    icon: Icon(
+                      AlbumLibraryManager.isLiked(widget.album)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      size: 24,
+                      color: AlbumLibraryManager.isLiked(widget.album)
+                          ? Colors.cyanAccent
+                          : Colors.white,
+                    ),
+                    onPressed: () async {
+
+                      if (AlbumLibraryManager.isLiked(widget.album)) {
+                        await AlbumLibraryManager.unlikeAlbum(widget.album);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Removed from Library")),
+                        );
+
+                      } else {
+                        await AlbumLibraryManager.likeAlbum(widget.album);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Added to Library")),
+                        );
+                      }
+
+                      setState(() {});
+                    },
                   ),
                 ),
                 /// ▶ PLAY / ⏸ PAUSE

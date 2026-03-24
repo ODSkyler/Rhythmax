@@ -6,6 +6,7 @@ import 'package:rhythmax/ui/app_shell_page.dart';
 import 'package:rhythmax/ui/album/album_page.dart';
 import 'package:rhythmax/ui/artist/artist_page.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
+import 'package:rhythmax/core/library/library_manager.dart';
 
 class TrackOptionsSheet extends StatelessWidget {
   final Track track;
@@ -44,6 +45,7 @@ class TrackOptionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isInQueue = globalPlayer.isTrackInQueue(track.id);
+    final isLiked = LibraryManager.isLiked(track);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       decoration: const BoxDecoration(
@@ -55,8 +57,23 @@ class TrackOptionsSheet extends StatelessWidget {
         children: [
           _handle(),
           _trackHeader(),
-
           const Divider(color: Colors.white24),
+
+          _option(
+            icon: isLiked ? Icons.favorite_border : Icons.favorite,
+            title: isLiked ? 'Remove from Library' : 'Add to Library',
+            onTap: () async {
+              Navigator.pop(context);
+
+              if (isLiked) {
+                await LibraryManager.unlikeTrack(track);
+                _showSnack(context, 'Removed from Library');
+              } else {
+                await LibraryManager.likeTrack(track);
+                _showSnack(context, 'Added to Library');
+              }
+            },
+          ),
 
           _option(
             icon: isInQueue ? Icons.remove_circle_outline : Icons.queue_music,
