@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import '../models/playlist.dart';
 
 class PlaylistLibraryManager {
-
   static final Box _box = Hive.box('library_playlists');
 
   static Future<void> likePlaylist(Playlist playlist) async {
@@ -19,8 +18,12 @@ class PlaylistLibraryManager {
 
   static List<Playlist> getLikedPlaylists() {
     return _box.values.map((e) {
-      final map = Map<String, dynamic>.from(e as Map);
-      return Playlist.fromMap(map);
-    }).toList();
+      try {
+        final map = Map<String, dynamic>.from(e as Map);
+        return Playlist.fromMap(map);
+      } catch (_) {
+        return null;
+      }
+    }).whereType<Playlist>().toList();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'liked_tracks_page.dart';
 import 'downloaded_page.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rhythmax/core/library/album_library_manager.dart';
 import 'package:rhythmax/core/library/artist_library_manager.dart';
 import 'package:rhythmax/core/library/playlist_library_manager.dart';
@@ -44,120 +45,125 @@ class _PlaylistsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: Hive.box('library_playlists').listenable(),
+      builder: (context, box, _) {
+        final playlists = PlaylistLibraryManager.getLikedPlaylists();
 
-    final playlists = PlaylistLibraryManager.getLikedPlaylists();
+        return ListView(
+          children: [
 
-    return ListView(
-      children: [
+            // ⭐ DEFAULT PLAYLISTS
 
-        // ⭐ DEFAULT PLAYLISTS
-
-        ListTile(
-          leading: const Icon(Icons.favorite, color: Colors.red),
-          title: const Text("Liked Tracks"),
-          subtitle: const Text(
-            "Songs you've liked",
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const LikedTracksPage(),
+            ListTile(
+              leading: const Icon(Icons.favorite, color: Colors.red),
+              title: const Text("Liked Tracks"),
+              subtitle: const Text(
+                "Songs you've liked",
+                style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
-            );
-          },
-        ),
-
-        ListTile(
-          leading: const Icon(Icons.download),
-          title: const Text("Downloaded"),
-          subtitle: const Text(
-            "Offline music",
-            style: TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const DownloadedPage(),
-              ),
-            );
-          },
-        ),
-
-        // ⭐ SEPARATOR
-        if (playlists.isNotEmpty)
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              "Saved Playlists",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LikedTracksPage(),
+                  ),
+                );
+              },
             ),
-          ),
 
-        if (playlists.isEmpty)
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              "No saved playlists yet",
-              style: TextStyle(color: Colors.white54),
+            ListTile(
+              leading: const Icon(Icons.download),
+              title: const Text("Downloaded"),
+              subtitle: const Text(
+                "Offline music",
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DownloadedPage(),
+                  ),
+                );
+              },
             ),
-          ),
 
-        // ⭐ DYNAMIC PLAYLISTS
-        ...playlists.map((playlist) {
-          return ListTile(
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.network(
-                playlist.artworkUrl ?? '',
-                width: 56,
-                height: 56,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  'assets/images/playlist_placeholder.jpg',
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
+            // ⭐ SEPARATOR
+            if (playlists.isNotEmpty)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Text(
+                  "Saved Playlists",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
 
-            title: Text(
-              playlist.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            subtitle: Text(
-              playlist.description ?? '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 13,
-              ),
-            ),
-
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PlaylistPage(playlist: playlist),
+            if (playlists.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  "No saved playlists yet",
+                  style: TextStyle(color: Colors.white54),
                 ),
+              ),
+
+            // ⭐ DYNAMIC PLAYLISTS
+            ...playlists.map((playlist) {
+              return ListTile(
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(
+                    playlist.artworkUrl ?? '',
+                    width: 56,
+                    height: 56,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      'assets/images/playlist_placeholder.jpg',
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                title: Text(
+                  playlist.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                subtitle: Text(
+                  playlist.description ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins Medium',
+                    color: Colors.grey,
+                    fontSize: 13,
+                  ),
+                ),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PlaylistPage(playlist: playlist),
+                    ),
+                  );
+                },
               );
-            },
-          );
-        }).toList(),
-      ],
+            }).toList(),
+          ],
+        );
+      },
     );
   }
 }
@@ -167,52 +173,55 @@ class _AlbumsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: Hive.box('library_albums').listenable(),
+      builder: (context, box, _) {
+        final albums = AlbumLibraryManager.getLikedAlbums();
 
-    final albums = AlbumLibraryManager.getLikedAlbums();
-
-    if (albums.isEmpty) {
-      return const Center(
-        child: Text(
-          'No liked albums',
-          style: TextStyle(color: Colors.white70),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: albums.length,
-      itemBuilder: (context, index) {
-
-        final album = albums[index];
-
-        return ListTile(
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-
-          leading: _artwork(album.artworkUrl, 56),
-
-          title: Text(
-            album.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          subtitle: Text(
-            album.artists.join(', '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontFamily: 'Poppins Medium',
-              color: Colors.white70,
-              fontSize: 13,
+        if (albums.isEmpty) {
+          return const Center(
+            child: Text(
+              'No liked albums',
+              style: TextStyle(color: Colors.white70),
             ),
-          ),
+          );
+        }
 
-          trailing: const Icon(Icons.more_vert, size: 18),
+        return ListView.builder(
+          itemCount: albums.length,
+          itemBuilder: (context, index) {
+            final album = albums[index];
 
-          onTap: () {
-            AppShellPage.of(context).pushPage(
-              AlbumPage(album: album),
+            return ListTile(
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+
+              leading: _artwork(album.artworkUrl, 56),
+
+              title: Text(
+                album.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              subtitle: Text(
+                album.artists.join(', '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: 'Poppins Medium',
+                  color: Colors.white70,
+                  fontSize: 13,
+                ),
+              ),
+
+              trailing: const Icon(Icons.more_vert, size: 18),
+
+              onTap: () {
+                AppShellPage.of(context).pushPage(
+                  AlbumPage(album: album),
+                );
+              },
             );
           },
         );
@@ -226,45 +235,49 @@ class _ArtistsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: Hive.box('library_artists').listenable(),
+      builder: (context, box, _) {
+        final artists = ArtistLibraryManager.getLikedArtists();
 
-    final artists = ArtistLibraryManager.getLikedArtists();
+        if (artists.isEmpty) {
+          return const Center(
+            child: Text(
+              'No liked artists',
+              style: TextStyle(color: Colors.white70),
+            ),
+          );
+        }
 
-    if (artists.isEmpty) {
-      return const Center(
-        child: Text(
-          'No liked artists',
-          style: TextStyle(color: Colors.white70),
-        ),
-      );
-    }
+        return ListView.builder(
+          itemCount: artists.length,
+          itemBuilder: (context, index) {
+            final artist = artists[index];
 
-    return ListView.builder(
-      itemCount: artists.length,
-      itemBuilder: (context, index) {
+            return ListTile(
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
 
-        final artist = artists[index];
+              leading: CircleAvatar(
+                radius: 28,
+                backgroundImage: artist.artworkUrl != null
+                    ? NetworkImage(artist.artworkUrl!)
+                    : const AssetImage(
+                  'assets/images/artist_placeholder.jpg',
+                ) as ImageProvider,
+              ),
 
-        return ListTile(
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              title: Text(
+                artist.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
 
-          leading: CircleAvatar(
-            radius: 28,
-            backgroundImage: artist.artworkUrl != null
-                ? NetworkImage(artist.artworkUrl!)
-                : const AssetImage('assets/images/artist_placeholder.jpg')
-            as ImageProvider,
-          ),
-
-          title: Text(
-            artist.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          onTap: () {
-            AppShellPage.of(context).pushPage(
-              ArtistDetailsPage(artist: artist),
+              onTap: () {
+                AppShellPage.of(context).pushPage(
+                  ArtistDetailsPage(artist: artist),
+                );
+              },
             );
           },
         );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rhythmax/core/player/player_provider.dart';
 import 'package:rhythmax/core/player/mini_player.dart';
-
 import 'home/home_page.dart';
 import 'search/search_page.dart';
 import 'library/library_page.dart';
@@ -34,7 +33,6 @@ class _AppShellState extends State<AppShellPage>
   BuildContext get context => super.context;
 
   String? _fullscreenRoute;
-
   int _currentTab = 0;
 
   final List<Widget> _tabs = const [

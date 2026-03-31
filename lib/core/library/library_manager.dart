@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import '../models/track.dart';
 
 class LibraryManager {
-
   static final Box _box = Hive.box('library');
 
   static Future<void> likeTrack(Track track) async {
@@ -19,11 +18,12 @@ class LibraryManager {
 
   static List<Track> getLikedTracks() {
     return _box.values.map((e) {
-
-      final map = Map<String, dynamic>.from(e as Map);
-
-      return Track.fromMap(map);
-
-    }).toList();
+      try {
+        final map = Map<String, dynamic>.from(e as Map);
+        return Track.fromMap(map);
+      } catch (_) {
+        return null;
+      }
+    }).whereType<Track>().toList();
   }
 }

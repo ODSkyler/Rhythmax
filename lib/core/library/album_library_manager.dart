@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import '../models/album.dart';
 
 class AlbumLibraryManager {
-
   static final Box _box = Hive.box('library_albums');
 
   static Future<void> likeAlbum(Album album) async {
@@ -19,8 +18,12 @@ class AlbumLibraryManager {
 
   static List<Album> getLikedAlbums() {
     return _box.values.map((e) {
-      final map = Map<String, dynamic>.from(e as Map);
-      return Album.fromMap(map);
-    }).toList();
+      try {
+        final map = Map<String, dynamic>.from(e as Map);
+        return Album.fromMap(map);
+      } catch (_) {
+        return null;
+      }
+    }).whereType<Album>().toList();
   }
 }
